@@ -95,38 +95,71 @@ function details(id){
 function deleteAparatLink(id){delete aparatLinks[String(id)];localStorage.setItem("moslemAparatLinks",JSON.stringify(aparatLinks));details(id)}
 async function loadFreeArchiveFilms(){
  const status=document.getElementById("onlineStatus");
+ const homeEmpty=document.getElementById("homeEmpty");
+ if(status)status.textContent="در حال پیدا کردن فیلم‌های رایگان با مجوز عمومی…";
+ if(homeEmpty)homeEmpty.textContent="در حال بارگذاری فیلم‌های رایگان و مجاز…";
  try{
-  // Search public-domain and CC0 separately using Internet Archive's documented license abbreviations.
-  const queries=["mediatype:movies AND licenseurl:http*publicdomain*","mediatype:movies AND licenseurl:http*zero*","collection:prelinger AND mediatype:movies"];
+  // Only query items explicitly marked Public Domain or CC0 in their own Internet Archive metadata.
+  const queries=[
+   'mediatype:movies AND licenseurl:*publicdomain*',
+   'mediatype:movies AND licenseurl:*zero*',
+   'collection:prelinger AND mediatype:movies AND licenseurl:*publicdomain*'
+  ];
   const batches=await Promise.all(queries.map(async q=>{
-   const api="https://archive.org/advancedsearch.php?q="+encodeURIComponent(q)+"&fl[]=identifier&fl[]=title&fl[]=year&fl[]=licenseurl&sort[]=downloads+desc&rows=30&page=1&output=json";
-   const response=await fetch(api);if(!response.ok)throw new Error("archive search unavailable");
-   const data=await response.json();return data.response?.docs||[];
+   const api="https://archive.org/advancedsearch.php?q="+encodeURIComponent(q)+"&fl[]=identifier&fl[]=title&fl[]=year&fl[]=licenseurl&sort[]=downloads+desc&rows=70&page=1&output=json";
+   const response=await fetch(api);
+   if(!response.ok)throw new Error("پاسخ جست‌وجوی آرشیو دریافت نشد");
+   const data=await response.json();
+   return data.response?.docs||[];
   }));
   const unique=new Map();
   batches.flat().forEach(d=>{if(d.identifier)unique.set(d.identifier,d)});
-  const results=await Promise.all([...unique.values()].slice(0,40).map(async d=>{
+  const candidates=[...unique.values()].slice(0,75);
+  const results=await Promise.all(candidates.map(async d=>{
    try{
     const mr=await fetch("https://archive.org/metadata/"+encodeURIComponent(d.identifier));
     if(!mr.ok)return null;
-    const m=await mr.json(),license=String(m.metadata?.licenseurl||d.licenseurl||"").toLowerCase();
-    // Do not present items unless their own item metadata identifies Public Domain or CC0.
+    const m=await mr.json();
+    const license=String(m.metadata?.licenseurl||d.licenseurl||"").toLowerCase();
     if(!license.includes("publicdomain")&&!license.includes("zero"))return null;
-    const files=(m.files||[]).filter(x=>x.name&&/\.mp4$/i.test(x.name)&&!x.name.includes("__ia_thumb")&&!x.name.includes("_thumb"));
+    const files=(m.files||[]).filter(x=>x.name&&/\.mp4$/i.test(x.name)&&!/__ia_thumb|_thumb/i.test(x.name)&&Number(x.size||0)>1000000);
     if(!files.length)return null;
-    files.sort((a,b)=>(Number(b.size)||0)-(Number(a.size)||0));
-    const file=files[0],encodedName=file.name.split("/").map(encodeURIComponent).join("/");
-    const base="https://archive.org/download/"+encodeURIComponent(d.identifier)+"/"+encodedName;
-    return {id:Math.abs(hashText(d.identifier))+900000000,title:String(m.metadata?.title||d.title||d.identifier),year:Number(m.metadata?.year||d.year)||null,genre:"کلاسیک",country:"بین‌المللی",lang:"نامشخص",rating:0,desc:"نسخه‌ای که در صفحهٔ منبع با مجوز عمومی یا CC0 مشخص شده است. برای بررسی جزئیات حقوقی و شرایط استفاده، صفحهٔ منبع را باز کن.",poster:(()=>{const imageFile=(m.files||[]).find(x=>/^__ia_thumb\.(jpg|jpeg|png)$/i.test(x.name||""));return imageFile?"https://archive.org/download/"+encodeURIComponent(d.identifier)+"/"+encodeURIComponent(imageFile.name):(/^https:\/\//i.test(m.metadata?.image||"")?m.metadata.image:"")})(),sourceName:"Internet Archive · "+(license.includes("zero")?"CC0":"Public Domain"),sourceUrl:"https://archive.org/details/"+encodeURIComponent(d.identifier),archiveIdentifier:d.identifier,archiveStream:"https://archive.org/embed/"+encodeURIComponent(d.identifier),archiveDownload:base,mediaType:"movie",colors:["#46566a","#101a2d"]};
+    // Prefer a practical MP4 derivative instead of accidentally selecting a multi-gigabyte master.
+    files.sort((a,b)=>{
+      const rank=x=>/512kb|480p|h\.264|h264/i.test(x.name)?0:/360p|256kb/i.test(x.name)?1:2;
+      return rank(a)-rank(b)||(Number(a.size)||0)-(Number(b.size)||0);
+    });
+    const file=files[0];
+    const encodedName=file.name.split("/").map(encodeURIComponent).join("/");
+    const download="https://archive.org/download/"+encodeURIComponent(d.identifier)+"/"+encodedName;
+    const image="https://archive.org/services/img/"+encodeURIComponent(d.identifier);
+    const title=String(m.metadata?.title||d.title||d.identifier).replace(/<[^>]*>/g," ").trim();
+    const year=Number(m.metadata?.year||d.year)||null;
+    const description=String(m.metadata?.description||"").replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
+    return {
+     id:Math.abs(hashText(d.identifier))+900000000,
+     title,year,genre:"کلاسیک",country:"بین‌المللی",lang:"زبان اصلی",rating:0,
+     cast:String(m.metadata?.creator||"در منبع ثبت نشده"),
+     desc:description.slice(0,900)||"فیلم آرشیوی با نشان مجوز عمومی یا CC0 در فرادادهٔ همین اثر.",
+     poster:image,sourceName:"Internet Archive · "+(license.includes("zero")?"CC0":"Public Domain"),
+     sourceUrl:"https://archive.org/details/"+encodeURIComponent(d.identifier),
+     archiveIdentifier:d.identifier,
+     archiveStream:"https://archive.org/embed/"+encodeURIComponent(d.identifier),
+     archiveDownload:download,mediaType:"movie",colors:["#46566a","#101a2d"]
+    };
    }catch(_){return null}
   }));
-  const valid=results.filter(x=>x&&x.poster),map=new Map();
-  
+  const valid=results.filter(x=>x&&x.title&&safeHttpUrl(x.poster));
+  const map=new Map();
   valid.forEach(x=>map.set(String(x.id),x));
-  films=[...map.values()].slice(0,220);saveCatalog();renderAll();
-  if(status)status.textContent=valid.length+" اثر با فرادادهٔ مجوز عمومی یا CC0، فایل MP4 و تصویر واقعی پیدا شد. آثار بدون هر سه مورد نمایش داده نمی‌شوند."
+  films=[...map.values()].slice(0,220);
+  saveCatalog();renderAll();
+  if(status)status.textContent=valid.length
+   ? valid.length+" فیلم رایگان پیدا شد؛ هرکدام با نشان Public Domain یا CC0، فایل MP4 و پوستر واقعی از Internet Archive."
+   : "این بار آرشیو فیلمی را که هم مجوز عمومی/CC0، هم MP4 و هم تصویر واقعی داشته باشد برنگرداند. دوباره امتحان کن.";
  }catch(e){
-  if(status)status.textContent="اتصال به آرشیو رایگان برقرار نشد؛ تا پیدا شدن منبع مجاز، هیچ فیلمی نمایش داده نمی‌شود."
+  if(status)status.textContent="اتصال به آرشیو فیلم برقرار نشد. ممکن است اینترنت یا دسترسی به archive.org محدود باشد. "+(e.message||"");
+  renderAll();
  }
 }
 function hashText(s){let h=0;for(let i=0;i<s.length;i++)h=((h<<5)-h+s.charCodeAt(i))|0;return h}
