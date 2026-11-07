@@ -60,16 +60,18 @@ button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1100px;mar
 <div class="notice">مسلم اطلاعات آثار را از منابع بیرونی دریافت می‌کند. این برنامه خودش میزبان یا پخش‌کننده فیلم نیست؛ لینک‌ها فقط به صفحات اطلاعاتی یا وب‌سایت‌های رسمی منابع می‌روند. دسترسی به منابع ممکن است بسته به کشور و شبکه متفاوت باشد.</div>
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="modalbox"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
 <script>
-let films=[]; // آثار واقعی پس از جست‌وجو از منابع آنلاین دریافت می‌شوند.
+let films=(()=>{try{return JSON.parse(localStorage.getItem("moslemCatalog")||"[]")}catch(_){return []}})(); // کاتالوگ ذخیره‌شده برای نمایش سریع در شروع
 let favorites=JSON.parse(localStorage.getItem("moslemFav")||"[]"),watched=JSON.parse(localStorage.getItem("moslemWatched")||"[]"),activeGenre="";
 function save(){localStorage.setItem("moslemFav",JSON.stringify(favorites));localStorage.setItem("moslemWatched",JSON.stringify(watched));}
+function saveCatalog(){try{localStorage.setItem("moslemCatalog",JSON.stringify(films.slice(0,180)))}catch(_){}}
 function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));if(id==="library")renderLibrary();if(id==="profile")updateCounts();window.scrollTo({top:0,behavior:"smooth"});}
 function card(f){return `<article class="movie"><div class="poster" style="--c1:${f.colors?.[0]||"#3a5367"};--c2:${f.colors?.[1]||"#101a2d"};${f.poster?`background-image:linear-gradient(0deg,#080b13dd,transparent 70%),url(${f.poster});background-size:cover;background-position:center`:""}"><span class="rating">${f.rating?"★ "+f.rating:"اطلاعات"}</span><button class="fav" onclick="toggleFav(${Number(f.id)})">${favorites.includes(Number(f.id))?"♥":"♡"}</button><div class="posterTitle">${escapeHtml(f.title)}</div></div><div class="movieInfo"><strong>${escapeHtml(f.title)}</strong><div class="meta">${f.year||"نامشخص"} · ${escapeHtml(f.genre||"ژانر نامشخص")} · ${escapeHtml(f.country||"بین‌المللی")}</div><div class="movieActions"><button class="smallbtn gold" onclick="details(${Number(f.id)})">جزئیات</button><button class="smallbtn" onclick="markWatched(${Number(f.id)})">${watched.includes(Number(f.id))?"تماشا شد ✓":"تماشا کردم"}</button></div></div></article>`}
-function renderMovies(){let q=(document.getElementById("q").value||"").trim().toLowerCase(),g=document.getElementById("genre").value,c=document.getElementById("country").value,y=document.getElementById("year").value,l=document.getElementById("lang").value,s=document.getElementById("sort").value;let arr=films.filter(f=>(!q||(f.title+" "+f.cast+" "+f.genre+" "+f.country).toLowerCase().includes(q))&&(!g||f.genre===g)&&(!c||f.country===c)&&(!y||String(f.year)===y)&&(!l||f.lang===l));arr.sort((a,b)=>s==="year"?b.year-a.year:s==="name"?a.title.localeCompare(b.title,"fa"):b.rating-a.rating);document.getElementById("movieGrid").innerHTML=arr.map(card).join("")||'<div class="empty">فیلمی با این مشخصات پیدا نشد.</div>';document.getElementById("resultCount").textContent=arr.length+" نتیجه";}
+function renderMovies(){let q=(document.getElementById("q").value||"").trim().toLowerCase(),g=document.getElementById("genre").value,c=document.getElementById("country").value,y=document.getElementById("year").value,l=document.getElementById("lang").value,s=document.getElementById("sort").value;let arr=films.filter(f=>(!q||(f.title+" "+f.cast+" "+f.genre+" "+f.country).toLowerCase().includes(q))&&(!g||f.genre===g)&&(!c||f.country===c||f.country==="بین‌المللی"||f.country==="نامشخص")&&(!y||String(f.year)===y)&&(!l||f.lang===l||f.lang==="ثبت‌نشده"||f.lang==="نامشخص"));arr.sort((a,b)=>s==="year"?(Number(b.year)||0)-(Number(a.year)||0):s==="name"?a.title.localeCompare(b.title,"fa"):(Number(b.rating)||0)-(Number(a.rating)||0));document.getElementById("movieGrid").innerHTML=arr.map(card).join("")||'<div class="empty">فیلمی با این مشخصات پیدا نشد.</div>';document.getElementById("resultCount").textContent=arr.length+" نتیجه";}
 function setGenre(g,el){activeGenre=g;document.querySelectorAll("#homeChips .chip").forEach(x=>x.classList.remove("active"));el.classList.add("active");document.getElementById("homeGrid").innerHTML=films.filter(f=>g==="همه"||f.genre===g).sort((a,b)=>b.rating-a.rating).map(card).join("")}
 function toggleFav(id){favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];save();renderAll()}
 function markWatched(id){if(!watched.includes(id))watched.push(id);save();renderAll()}
-function details(id){let f=films.find(x=>Number(x.id)===Number(id));if(!f)return;document.getElementById("modalContent").innerHTML=`<div class="eyebrow">جزئیات اثر · ${f.sourceName||"اطلاعات نمونه"}</div><h2>${f.title}</h2><p class="muted">${f.year||"سال نامشخص"} · ${f.genre||"ژانر نامشخص"} · ${f.country||"بین‌المللی"} · ${f.lang||"زبان ثبت‌نشده"}</p><h3>${f.rating?"★ "+f.rating+" از ۱۰":"امتیاز ثبت نشده"}</h3><p>${f.desc||"توضیحی برای این اثر ثبت نشده است."}</p><p class="muted">بازیگران / عوامل: ${f.cast||"در منبع فعلی موجود نیست"}</p>${f.tvmazeId?`<button class="smallbtn" onclick="fetchSeriesCast(${Number(f.tvmazeId)})">دریافت فهرست بازیگران</button>`:""}${f.sourceUrl?`<p><a href="${f.sourceUrl}" target="_blank" rel="noopener" style="color:#f0cf86">مشاهده صفحه اثر در منبع اطلاعاتی ↗</a></p>`:""}<div class="notice">این لینک صفحه اطلاعات اثر است، نه تضمین پخش یا دانلود رایگان. لینک تماشا فقط از سرویس‌های دارای مجوز نمایش داده می‌شود.</div><button class="btn" onclick="toggleFav(${Number(id)});closeModal()">افزودن / حذف از علاقه‌مندی‌ها</button>`;document.getElementById("modal").classList.add("show")}
+function safeHttpUrl(value){try{const u=new URL(value);return u.protocol==="https:"?u.href:""}catch(_){return""}}
+function details(id){let f=films.find(x=>Number(x.id)===Number(id));if(!f)return;const source=safeHttpUrl(f.sourceUrl);document.getElementById("modalContent").innerHTML=`<div class="eyebrow">جزئیات اثر · ${escapeHtml(f.sourceName||"منبع اطلاعاتی")}</div><h2>${escapeHtml(f.title)}</h2><p class="muted">${escapeHtml(f.year||"سال نامشخص")} · ${escapeHtml(f.genre||"ژانر نامشخص")} · ${escapeHtml(f.country||"نامشخص")} · ${escapeHtml(f.lang||"نامشخص")}</p><h3>${f.rating?"★ "+escapeHtml(f.rating)+" از ۱۰":"امتیاز ثبت نشده"}</h3><p>${escapeHtml(f.desc||"توضیحی برای این اثر ثبت نشده است.")}</p><p class="muted">بازیگران / عوامل: ${escapeHtml(f.cast||"در منبع فعلی موجود نیست")}</p>${f.tvmazeId?`<button class="smallbtn" onclick="fetchSeriesCast(${Number(f.tvmazeId)})">دریافت فهرست بازیگران</button>`:""}${source?`<p><a href="${source}" target="_blank" rel="noopener noreferrer" style="color:#f0cf86">مشاهده صفحه اثر در منبع اطلاعاتی ↗</a></p>`:""}<div class="notice">این لینک صفحه اطلاعات اثر است، نه تضمین پخش یا دانلود رایگان. لینک تماشا فقط از سرویس‌های دارای مجوز نمایش داده می‌شود.</div><button class="btn" onclick="toggleFav(${Number(id)});closeModal()">افزودن / حذف از علاقه‌مندی‌ها</button>`;document.getElementById("modal").classList.add("show")}
 function closeModal(){document.getElementById("modal").classList.remove("show")}
 function renderLibrary(){let fav=films.filter(f=>favorites.includes(f.id)),wat=films.filter(f=>watched.includes(f.id));document.getElementById("favList").innerHTML=fav.map(f=>`<div class="listrow"><span>${f.title}</span><button class="smallbtn" onclick="details(${f.id})">جزئیات</button></div>`).join("")||'<div class="empty">هنوز فیلمی اضافه نشده.</div>';document.getElementById("watchedList").innerHTML=wat.map(f=>`<div class="listrow"><span>${f.title}</span><span class="tag">تماشا شده</span></div>`).join("")||'<div class="empty">هنوز فیلمی ثبت نشده.</div>';document.getElementById("homeFav").textContent=fav.length?fav.map(f=>f.title).join("، "):"هنوز فیلمی ذخیره نکرده‌ای."}
 function updateCounts(){document.getElementById("favCount").textContent=favorites.length;document.getElementById("watchedCount").textContent=watched.length}
@@ -189,7 +191,7 @@ async function searchOnlineCatalog(){
     if(!payload || !Array.isArray(payload.results)) payload=await itunesJsonp(q);
     const found=(payload.results||[]).filter(x=>x.trackId&&x.trackName).map(mapItunesMovie);
     if(!found.length){status.textContent='منبع اپل برای این عبارت نتیجه‌ای نداد. نام انگلیسی کوتاه‌تر را امتحان کن.';return;}
-    found.forEach(f=>{const i=films.findIndex(old=>Number(old.id)===f.id);if(i>=0)films[i]=f;else films.push(f);});
+    found.forEach(f=>{const i=films.findIndex(old=>Number(old.id)===f.id);if(i>=0)films[i]=f;else films.push(f);});saveCatalog();
     ['genre','country','year','lang'].forEach(id=>document.getElementById(id).value='');
     renderMovies();
     status.textContent=found.length+' نتیجه دریافت شد. توجه: این کاتالوگ کامل نیست و لینک‌ها صفحه اطلاعات/فروشگاه‌اند، نه لینک تماشای رایگان.';
@@ -226,7 +228,7 @@ async function searchSeriesOnline(){
       poster:a.image?.original||a.image?.medium||'',sourceName:'TVmaze',sourceUrl:a.officialSite||a.url||'',mediaType:'series'
     };});
     if(!found.length){status.textContent='سریالی پیدا نشد؛ املای انگلیسی عنوان را امتحان کن.';return;}
-    found.forEach(f=>{const i=films.findIndex(z=>Number(z.id)===f.id);if(i<0)films.push(f);else films[i]=f;});
+    found.forEach(f=>{const i=films.findIndex(z=>Number(z.id)===f.id);if(i<0)films.push(f);else films[i]=f;});saveCatalog();
     grid.innerHTML=found.map(card).join('');
     status.textContent=found.length+' سریال پیدا شد. اطلاعات از TVmaze است؛ لینک رسمی فقط در صورت ثبت‌شدن توسط منبع نمایش داده می‌شود.';
   }catch(e){status.textContent='اتصال به منبع سریال ناموفق بود؛ ممکن است دسترسی شبکه محدود باشد. '+(e.message||'');}
@@ -244,6 +246,45 @@ async function loadTVSchedule(){
     status.textContent=rows.length+' قسمت در برنامه پخش آمریکا برای '+date+' پیدا شد. این تقویم جهانی و مخصوص همه کشورها نیست.';
   }catch(e){status.textContent='دریافت تقویم ناموفق بود؛ ممکن است دسترسی شبکه محدود باشد. '+(e.message||'');}
 }
+
+/* بارگذاری خودکار صفحه خانه از فهرست برترین فیلم‌های فروشگاه Apple؛ صرفاً فراداده و پیوند اطلاعاتی */
+function mapTopMovie(e){
+  const a=e["im:artist"]||{},img=(e["im:image"]||[]),cat=e.category?.attributes?.term||"نامشخص";
+  const rawYear=e["im:releaseDate"]?.label||"";
+  return {id:Number(e.id?.attributes?.["im:id"]||0),title:e["im:name"]?.label||"بدون نام",
+    year:rawYear?Number(rawYear.slice(0,4))||null:null,genre:cat,country:"بین‌المللی",lang:"نامشخص",
+    rating:0,cast:a.label||"در منبع ثبت نشده",desc:e.summary?.label||"خلاصه در منبع ثبت نشده است.",
+    poster:img.length?img[img.length-1].label:"",sourceName:"Apple Top Movies",sourceUrl:e.link?.attributes?.href||"",
+    mediaType:"movie",colors:["#38566f","#121b2d"]};
+}
+async function loadHomeCatalog(){
+  const status=document.getElementById("onlineStatus");
+  if(films.length){renderAll();if(status)status.textContent="فهرست ذخیره‌شده نمایش داده شد؛ در حال تازه‌سازی فهرست آنلاین…";}
+  try{
+    let data=null;
+    const url="https://itunes.apple.com/us/rss/topmovies/limit=50/json";
+    try{const r=await fetch(url);if(r.ok)data=await r.json();}catch(_){}
+    if(!data?.feed?.entry){
+      data=await new Promise((resolve,reject)=>{
+        const cb="moslemTop_"+Date.now(),s=document.createElement("script");
+        const timer=setTimeout(()=>{delete window[cb];s.remove();reject(new Error("پاسخ فهرست آنلاین دریافت نشد"))},12000);
+        window[cb]=v=>{clearTimeout(timer);delete window[cb];s.remove();resolve(v)};
+        s.onerror=()=>{clearTimeout(timer);delete window[cb];s.remove();reject(new Error("دسترسی به فهرست آنلاین برقرار نشد"))};
+        s.src=url+"?callback="+cb;document.head.appendChild(s);
+      });
+    }
+    const items=(data.feed?.entry||[]).map(mapTopMovie).filter(x=>x.id&&x.title);
+    if(!items.length)throw new Error("فهرست آنلاین خالی بود");
+    const map=new Map(films.map(f=>[String(f.id),f]));
+    items.forEach(f=>map.set(String(f.id),f));
+    films=[...map.values()].slice(0,180);saveCatalog();renderAll();
+    if(status)status.textContent=items.length+" فیلم از فهرست برترین‌های فروشگاه Apple بارگذاری شد. این فهرست منطقه‌ای است و لینک‌ها اطلاعات/فروشگاه‌اند، نه پخش رایگان.";
+  }catch(e){
+    if(status)status.textContent=films.length?"فهرست ذخیره‌شده نمایش داده شد؛ تازه‌سازی آنلاین در دسترس نبود.":"فعلاً منبع آنلاین در دسترس نیست. جست‌وجوی عنوان را امتحان کن.";
+    renderAll();
+  }
+}
+
 const scheduleInput=document.getElementById('scheduleDate');if(scheduleInput)scheduleInput.value=new Date().toISOString().slice(0,10);
 
 moslemDb.auth.onAuthStateChange((_event,_session)=>{
@@ -251,6 +292,7 @@ moslemDb.auth.onAuthStateChange((_event,_session)=>{
 });
 loadMoslemAccount();
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+loadHomeCatalog();
 
 </script>
 </body>
