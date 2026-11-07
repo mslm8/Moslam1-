@@ -84,25 +84,12 @@ function setGenre(g,el){activeGenre=g;document.querySelectorAll("#homeChips .chi
 function toggleFav(id){favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];save();renderAll()}
 function markWatched(id){if(!watched.includes(id))watched.push(id);save();renderAll()}
 function safeHttpUrl(value){try{const u=new URL(value);return u.protocol==="https:"?u.href:""}catch(_){return""}}
-let aparatLinks=(()=>{try{return JSON.parse(localStorage.getItem("moslemAparatLinks")||"{}")}catch(_){return {}}})();
-function extractAparatHash(value){
- const s=String(value||"").trim();
- const m=s.match(/(?:aparat\.com\/(?:v|video\/video\/embed\/videohash)\/)([A-Za-z0-9_-]+)/i);
- return m?m[1]:"";
-}
-function playAparatForMovie(id){
- const input=document.getElementById("aparatUrl");
- const hash=extractAparatHash(input?.value);
- if(!hash){const msg=document.getElementById("aparatMessage");if(msg)msg.textContent="لینک معتبر ویدئوی آپارات را وارد کن؛ مثل aparat.com/v/شناسه";return;}
- aparatLinks[String(id)]=hash;
- localStorage.setItem("moslemAparatLinks",JSON.stringify(aparatLinks));
- details(id);
-}
+// پخش‌کننده آپارات حذف شده است؛ لینک دستی در جزئیات نمایش داده نمی‌شود.
 function details(id){
  let f=films.find(x=>Number(x.id)===Number(id));
  if(!f||!isFreeVerified(f))return;
  const source=safeHttpUrl(f.sourceUrl),hash=aparatLinks[String(id)]||"";
- document.getElementById("modalContent").innerHTML=`<div class="eyebrow">اثر رایگان با منبع مجوزدار · ${escapeHtml(f.sourceName||"Internet Archive")}</div><h2>${escapeHtml(f.title)}</h2><p class="muted">${escapeHtml(f.year||"سال نامشخص")} · ${escapeHtml(f.genre||"ژانر نامشخص")} · ${escapeHtml(f.country||"نامشخص")}</p><p>${escapeHtml(f.desc||"توضیحی برای این اثر ثبت نشده است.")}</p>${source?`<p><a href="${source}" target="_blank" rel="noopener noreferrer" style="color:#f0cf86">بررسی صفحه منبع و مجوز ↗</a></p>`:""}<div class="panel" style="margin:14px 0"><h3>🎬 تماشای رایگان</h3><iframe src="${escapeHtml(f.archiveStream)}" title="پخش فیلم آرشیوی" allowfullscreen loading="lazy" style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px"></iframe><a class="btn" style="display:block;text-align:center;text-decoration:none;margin-top:10px" href="${escapeHtml(f.archiveDownload)}" target="_blank" rel="noopener noreferrer">دانلود رایگان فایل ↧</a><p class="muted">قبل از استفاده، شرایط مجوز همان نسخه را در صفحه منبع بررسی کن.</p></div><div class="panel" style="margin:14px 0"><h3>▶ لینک آپارات با اجازه بازنشر</h3>${hash?`<div style="position:relative;width:100%;aspect-ratio:16/9"><iframe src="https://www.aparat.com/video/video/embed/videohash/${encodeURIComponent(hash)}/vt/frame" title="پخش ویدئوی آپارات" allow="autoplay;fullscreen;picture-in-picture" allowfullscreen loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:12px"></iframe></div><button class="smallbtn" style="margin-top:9px" onclick="deleteAparatLink(${Number(id)})">حذف لینک آپارات</button>`:`<p class="muted">فقط لینک ویدئویی را اضافه کن که صاحب اثر اجازه پخش یا جاسازی آن را داده باشد.</p>`}<input id="aparatUrl" type="url" placeholder="لینک ویدئوی مجاز آپارات" style="width:100%;padding:11px;margin:8px 0;background:#0d1421;color:white;border:1px solid var(--line);border-radius:10px"><button class="btn" style="width:100%" onclick="playAparatForMovie(${Number(id)})">ثبت لینک مجاز</button><p id="aparatMessage" class="muted"></p></div><button class="btn" onclick="toggleFav(${Number(id)});closeModal()">افزودن / حذف از علاقه‌مندی‌ها</button>`;
+ document.getElementById("modalContent").innerHTML=`<div class="eyebrow">اثر رایگان با منبع مجوزدار · ${escapeHtml(f.sourceName||"Internet Archive")}</div><h2>${escapeHtml(f.title)}</h2><p class="muted">${escapeHtml(f.year||"سال نامشخص")} · ${escapeHtml(f.genre||"ژانر نامشخص")} · ${escapeHtml(f.country||"نامشخص")}</p><p>${escapeHtml(f.desc||"توضیحی برای این اثر ثبت نشده است.")}</p>${source?`<p><a href="${source}" target="_blank" rel="noopener noreferrer" style="color:#f0cf86">بررسی صفحه منبع و مجوز ↗</a></p>`:""}<div class="panel" style="margin:14px 0"><h3>🎬 تماشای رایگان</h3><iframe src="${escapeHtml(f.archiveStream)}" title="پخش فیلم آرشیوی" allowfullscreen loading="lazy" style="width:100%;aspect-ratio:16/9;border:0;border-radius:12px"></iframe><a class="btn" style="display:block;text-align:center;text-decoration:none;margin-top:10px" href="${escapeHtml(f.archiveDownload)}" target="_blank" rel="noopener noreferrer">دانلود رایگان فایل ↧</a><p class="muted">قبل از استفاده، شرایط مجوز همان نسخه را در صفحه منبع بررسی کن.</p></div><button class="btn" onclick="toggleFav(${Number(id)});closeModal()">افزودن / حذف از علاقه‌مندی‌ها</button>`;
  document.getElementById("modal").classList.add("show");
 }
 function deleteAparatLink(id){delete aparatLinks[String(id)];localStorage.setItem("moslemAparatLinks",JSON.stringify(aparatLinks));details(id)}
