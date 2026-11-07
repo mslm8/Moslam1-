@@ -1,19 +1,239 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090d18"><title>مسلم | دنیای فیلم و سریال</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b13">
+<meta name="description" content="مسلم؛ جست‌وجو و مدیریت فهرست فیلم‌ها و سریال‌ها با منابع اطلاعاتی آنلاین">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>مسلم | سینما در جیب تو</title>
 <style>
-:root{--bg:#090d18;--panel:#111a2b;--panel2:#17243a;--gold:#e7b84f;--blue:#63a9ff;--muted:#9eabc0;--text:#f5f7fb}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#1b3152 0,transparent 45%),var(--bg);color:var(--text);font-family:Tahoma,Arial,sans-serif}header{position:sticky;top:0;z-index:5;background:#090d18ed;backdrop-filter:blur(12px);border-bottom:1px solid #27344a;padding:14px 5%;display:flex;align-items:center;gap:18px;flex-wrap:wrap}.brand{font-size:25px;font-weight:bold;color:var(--gold)}nav{display:flex;gap:8px;flex:1;flex-wrap:wrap}button,.navbtn{border:1px solid #34435b;background:var(--panel);color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font:inherit}.navbtn.active,button.primary{background:var(--gold);color:#17130a;border-color:var(--gold);font-weight:bold}main{max-width:1150px;margin:auto;padding:25px 18px}.hero{padding:34px 26px;border:1px solid #34435b;border-radius:22px;background:linear-gradient(110deg,#172a45,#101827 65%,#302719);margin-bottom:25px}.hero small{color:var(--gold)}h1{font-size:clamp(27px,5vw,44px);margin:12px 0}p{color:var(--muted);line-height:1.9}.tools{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}.tools input,.tools select{background:var(--panel);border:1px solid #34435b;border-radius:12px;padding:12px;color:white;font:inherit;min-width:150px;flex:1}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:25px 0 14px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:16px}.movie{background:var(--panel);border:1px solid #26364e;border-radius:16px;overflow:hidden;cursor:pointer;transition:.2s}.movie:hover{transform:translateY(-4px);border-color:var(--gold)}.poster{height:205px;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;font-size:22px;font-weight:bold;background:linear-gradient(145deg,#294969,#111827 65%,#7a5927)}.poster.alt{background:linear-gradient(145deg,#4b345f,#162b43 65%,#b17b39)}.info{padding:12px}.info b{display:block;margin-bottom:8px}.tag{font-size:12px;color:var(--gold)}.empty{padding:30px;text-align:center;color:var(--muted);background:var(--panel);border-radius:15px}.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.dialog{max-width:520px;width:100%;background:var(--panel);border:1px solid #52627b;border-radius:20px;padding:22px}.close{float:left}.notice{font-size:12px;color:#9eabc0;margin-top:30px;border-top:1px solid #26364e;padding-top:15px}footer{text-align:center;padding:30px;color:var(--muted)}
-</style></head>
-<body><header><div class="brand">مسلم</div><nav><button class="navbtn active" data-filter="همه">خانه</button><button class="navbtn" data-filter="فیلم">فیلم‌ها</button><button class="navbtn" data-filter="انیمیشن">انیمیشن</button><button class="navbtn" data-filter="تماشای من">فهرست من</button></nav></header>
-<main><section class="hero"><small>دنیای سرگرمی، یک‌جا</small><h1>فیلم خوبت رو پیدا کن</h1><p>کشف و معرفی فیلم‌ها و انیمیشن‌های رایگان و آثار دارای منبع قانونی. این نسخه اولیه برای نمایش و آزمایش امکانات سایت مسلم آماده شده است.</p><button class="primary" onclick="document.getElementById('search').focus()">جست‌وجوی آثار</button></section>
-<div class="tools"><input id="search" placeholder="نام فیلم یا ژانر را جست‌وجو کن..."><select id="genre"><option value="همه">همه ژانرها</option><option>ماجراجویی</option><option>علمی‌تخیلی</option><option>انیمیشن</option><option>درام</option></select></div>
-<div class="sectionhead"><h2 id="heading">پیشنهادهای تماشا</h2><span class="tag" id="count"></span></div><div class="grid" id="grid"></div>
-<div class="notice">توجه: این نسخه نمایشی است. برای تماشای آثار، فقط از پیوندهای رسمی و مجاز استفاده کنید. فعلاً ورود کاربران، پایگاه داده و پخش آنلاین به سرویس واقعی متصل نیست.</div></main><footer>© مسلم — نسخه آزمایشی</footer>
-<div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="dialog"><button class="close" onclick="closeModal()">بستن ×</button><div id="detail"></div></div></div>
+:root{--bg:#080b13;--panel:#111827;--panel2:#172033;--gold:#d8ad58;--gold2:#f0cf86;--text:#f5f3ee;--muted:#a8afbd;--line:#293246;--red:#c84b54;--green:#42b883}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -15%,#26304b 0,transparent 38%),var(--bg);color:var(--text);font-family:Tahoma,"Segoe UI",sans-serif;line-height:1.65}
+button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1100px;margin:auto;padding-bottom:88px}.top{position:sticky;top:0;z-index:10;background:#080b13ed;backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:12px 16px}.toprow{display:flex;align-items:center;gap:12px}.brand{display:flex;align-items:center;gap:9px;font-weight:900;font-size:21px;white-space:nowrap}.logo{width:39px;height:39px;border-radius:13px;background:linear-gradient(135deg,#f2d18d,#a8752e);color:#15100a;display:grid;place-items:center;font-weight:1000;font-size:22px;box-shadow:0 5px 22px #d8ad5833}.search{flex:1;position:relative}.search input{width:100%;background:#151d2c;border:1px solid var(--line);border-radius:14px;padding:11px 42px 11px 12px;color:white;outline:none}.search:before{content:"⌕";position:absolute;right:14px;top:0;color:var(--gold);font-size:27px}.iconbtn{border:1px solid var(--line);background:#151d2c;color:var(--gold2);border-radius:13px;width:42px;height:42px;font-size:19px}
+.hero{margin:18px 16px 22px;min-height:235px;border:1px solid #665331;border-radius:24px;overflow:hidden;position:relative;background:linear-gradient(100deg,#101827 4%,#171e2b 45%,#553d27 100%);display:flex;align-items:end;padding:23px}.hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 25% 30%,#d8ad5840,transparent 32%),linear-gradient(0deg,#080b13e8,transparent 75%)}.heroContent{position:relative;max-width:550px}.eyebrow{color:var(--gold2);font-size:12px;letter-spacing:.4px}.hero h1{font-size:clamp(25px,5vw,39px);margin:6px 0}.hero p{color:#d3d5dc;margin:4px 0 14px;font-size:14px}.btn{border:0;border-radius:12px;padding:10px 16px;background:linear-gradient(135deg,var(--gold2),#b98537);color:#17120b;font-weight:800}.btn.secondary{background:#202a3d;color:var(--text);border:1px solid var(--line)}.section{padding:0 16px;margin:22px 0}.secthead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.secthead h2{font-size:18px;margin:0}.muted{color:var(--muted);font-size:12px}.chips{display:flex;gap:8px;overflow:auto;padding:2px 16px 10px;scrollbar-width:none}.chip{white-space:nowrap;border:1px solid var(--line);border-radius:30px;padding:7px 13px;background:#111827;color:#cbd0da;font-size:12px}.chip.active{background:#493a22;border-color:#a77d3b;color:#ffe0a1}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.movie{min-width:0;background:linear-gradient(180deg,#172033,#101622);border:1px solid var(--line);border-radius:17px;overflow:hidden;position:relative}.poster{height:190px;position:relative;display:flex;align-items:end;padding:12px;background:linear-gradient(145deg,var(--c1),var(--c2));overflow:hidden}.poster:before{content:"";position:absolute;width:180px;height:180px;border:1px solid #ffffff35;border-radius:50%;top:-70px;left:-30px;box-shadow:0 0 0 18px #ffffff0a,0 0 0 38px #ffffff08}.poster:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#080b13dd,transparent 70%)}.posterTitle{position:relative;z-index:1;font-weight:900;font-size:20px;text-shadow:0 2px 9px #000}.rating{position:absolute;z-index:2;top:10px;right:10px;background:#080b13d9;border:1px solid #ffffff2c;border-radius:9px;padding:3px 7px;font-size:11px;color:#ffdb8a}.fav{position:absolute;z-index:2;left:9px;top:8px;background:#080b13b8;border:1px solid #ffffff30;border-radius:50%;width:32px;height:32px;color:white;font-size:17px}.movieInfo{padding:10px 11px}.movieInfo strong{display:block;font-size:14px}.meta{color:var(--muted);font-size:11px;margin:3px 0 8px}.movieActions{display:flex;gap:7px}.smallbtn{flex:1;background:#202a3d;border:1px solid var(--line);border-radius:9px;color:#e9d6b1;padding:7px 5px;font-size:11px}.smallbtn.gold{background:#493a22;color:#ffdfa1;border-color:#8d6a34}
+.panel{background:#111827;border:1px solid var(--line);border-radius:17px;padding:15px}.filters{display:grid;grid-template-columns:1fr 1fr;gap:9px}.filters select,.filters input{min-width:0;background:#0d1421;color:white;border:1px solid var(--line);border-radius:10px;padding:9px}.page{display:none}.page.active{display:block}.bottom{position:fixed;z-index:20;bottom:0;left:0;right:0;background:#0b101bed;backdrop-filter:blur(15px);border-top:1px solid var(--line);display:flex;justify-content:center;padding:7px max(8px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom));}.nav{width:min(700px,100%);display:flex;justify-content:space-around;gap:4px}.nav button{flex:1;background:none;border:0;color:#929bad;font-size:10px;padding:5px 2px;border-radius:11px}.nav button span{display:block;font-size:20px}.nav button.active{color:var(--gold2);background:#d8ad5817}
+.empty{text-align:center;padding:35px 15px;color:var(--muted)}.listrow{display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid var(--line);padding:12px 0}.listrow:last-child{border:0}.tag{font-size:10px;border:1px solid #76603a;color:#f0cf86;border-radius:20px;padding:3px 8px}.notice{background:#1d2638;border:1px solid #35435d;border-radius:13px;padding:12px;color:#d4d9e4;font-size:12px;margin:14px 16px}.modal{display:none;position:fixed;z-index:50;inset:0;background:#000b;align-items:center;justify-content:center;padding:18px}.modal.show{display:flex}.modalbox{width:min(500px,100%);background:#111827;border:1px solid #5a4a2d;border-radius:20px;padding:20px;max-height:85vh;overflow:auto}.close{float:left;background:none;border:0;color:white;font-size:23px}.bar{height:8px;background:#273248;border-radius:10px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .3s}
+@media(min-width:650px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.poster{height:230px}.hero{min-height:280px}.filters{grid-template-columns:repeat(4,1fr)}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="toprow"><div class="brand"><div class="logo">م</div>مسلم</div><div class="search"><input id="q" placeholder="جست‌وجوی فیلم، بازیگر..." oninput="renderMovies()"></div><button class="iconbtn" onclick="showPage('profile')" aria-label="پروفایل">☻</button></div></header>
+<main>
+<section id="home" class="page active">
+<div class="hero"><div class="heroContent"><div class="eyebrow">تجربه سینمایی مسلم</div><h1>دنیای فیلم‌ها، یک‌جا</h1><p>فیلم‌ها و سریال‌های محبوبت را پیدا کن، ذخیره کن و درباره‌شان نظر بده.</p><button class="btn" onclick="showPage('movies')">کشف فیلم‌ها　←</button></div></div>
+<div class="chips" id="homeChips"><button class="chip active" onclick="setGenre('همه',this)">همه</button><button class="chip" onclick="setGenre('اکشن',this)">اکشن</button><button class="chip" onclick="setGenre('درام',this)">درام</button><button class="chip" onclick="setGenre('معمایی',this)">معمایی</button><button class="chip" onclick="setGenre('علمی‌تخیلی',this)">علمی‌تخیلی</button><button class="chip" onclick="setGenre('انیمیشن',this)">انیمیشن</button></div>
+<div class="section"><div class="secthead"><h2>⭐ برترین فیلم‌ها</h2><span class="muted">آثار دریافت‌شده از منابع آنلاین</span></div><div class="grid" id="homeGrid"></div><div id="homeEmpty" class="empty">برای دیدن فیلم‌های واقعی، از بخش جست‌وجو نام فیلم را وارد کن.</div></div>
+<div class="section"><div class="secthead"><h2>❤️ علاقه‌مندی‌های تو</h2><button class="smallbtn" onclick="showPage('library')">مشاهده همه</button></div><div id="homeFav" class="panel muted">هنوز فیلمی ذخیره نکرده‌ای.</div></div>
+</section>
+<section id="movies" class="page">
+<div class="section"><div class="secthead"><h2>جست‌وجو و کشف فیلم</h2><span class="muted" id="resultCount"></span></div>
+<div class="panel"><div class="filters">
+<select id="genre" onchange="renderMovies()"><option value="">همه ژانرها</option><option>اکشن</option><option>درام</option><option>معمایی</option><option>علمی‌تخیلی</option><option>انیمیشن</option></select>
+<select id="country" onchange="renderMovies()"><option value="">همه کشورها</option><option>ایران</option><option>آمریکا</option><option>ژاپن</option></select>
+<select id="year" onchange="renderMovies()"><option value="">همه سال‌ها</option><option>2025</option><option>2024</option><option>2023</option><option>2022</option></select>
+<select id="lang" onchange="renderMovies()"><option value="">همه زبان‌ها</option><option>دوبله فارسی</option><option>زبان اصلی</option><option>زیرنویس فارسی</option></select>
+<select id="sort" onchange="renderMovies()"><option value="rating">بیشترین امتیاز</option><option value="year">جدیدترین سال</option><option value="name">نام فیلم</option></select>
+</div><button class="btn" style="width:100%;margin-top:12px" onclick="searchOnlineCatalog()">جست‌وجوی آنلاین در کاتالوگ اپل</button><p id="onlineStatus" class="muted" style="margin:9px 2px 0">برای دریافت اطلاعات واقعی فیلم‌ها، نام اثر را بنویس و جست‌وجوی آنلاین را بزن.</p></div><div class="grid" id="movieGrid" style="margin-top:14px"></div></div>
+</section>
+<section id="series" class="page"><div class="section"><div class="secthead"><h2>📺 جست‌وجوی سریال</h2><span class="muted">منبع آزاد TVmaze</span></div><div class="panel"><input id="seriesQuery" placeholder="نام سریال را وارد کن؛ مثلاً Sherlock" style="width:100%;background:#0d1421;color:white;border:1px solid var(--line);border-radius:10px;padding:11px"><button class="btn" style="width:100%;margin-top:10px" onclick="searchSeriesOnline()">جست‌وجوی آنلاین سریال</button><p id="seriesStatus" class="muted">اطلاعات سریال، پوستر، سال شروع، ژانر و صفحه رسمی در صورت وجود.</p></div><div class="grid" id="seriesGrid" style="margin-top:14px"></div><div class="section"><h3>📅 برنامه پخش روزانه</h3><div class="panel"><input id="scheduleDate" type="date" style="background:#0d1421;color:white;border:1px solid var(--line);border-radius:10px;padding:10px"><button class="btn" style="margin:8px 0;width:100%" onclick="loadTVSchedule()">نمایش برنامه پخش</button><p id="scheduleStatus" class="muted">برنامه پخش روزانه از TVmaze دریافت می‌شود؛ منطقه زمانی و پوشش شبکه‌ها ممکن است متفاوت باشد.</p><div id="scheduleList"></div></div></div></div></section>
+<section id="animation" class="page"><div class="section"><div class="secthead"><h2>🎨 انیمیشن‌ها</h2></div><div class="grid" id="animationGrid"></div></div></section>
+<section id="library" class="page"><div class="section"><div class="secthead"><h2>📚 کتابخانه من</h2></div><div class="panel"><h3>علاقه‌مندی‌ها ❤️</h3><div id="favList"></div><hr style="border-color:var(--line)"><h3>تماشا‌شده‌ها 👀</h3><div id="watchedList"></div></div></div></section>
+<section id="downloads" class="page"><div class="section"><div class="secthead"><h2>⬇️ دانلودها</h2></div><div class="panel"><p>در این نسخه، بخش دانلود فقط نمایشی است. لینک دانلود فقط پس از اتصال به منبع دارای مجوز و بررسی قانونی فعال می‌شود.</p><div class="listrow"><span>دانلودهای تکمیل‌شده</span><b>۰</b></div><div class="listrow"><span>دانلودهای در حال انجام</span><b>۰</b></div></div></div></section>
+<section id="profile" class="page"><div class="section"><div class="secthead"><h2>👤 پروفایل</h2></div><div class="panel"><div style="font-size:38px">👤</div><h3>کاربر مسلم</h3><p class="muted" id="accountStatus">برای همگام‌سازی اطلاعات، وارد حساب خودت شو.</p><div class="listrow"><span>فیلم‌های علاقه‌مندی</span><b id="favCount">۰</b></div><div class="listrow"><span>فیلم‌های تماشا‌شده</span><b id="watchedCount">۰</b></div><button class="btn secondary" id="accountButton" onclick="openAccount()">ورود / ثبت‌نام</button></div></div>
+<div class="section"><div class="secthead"><h2>📅 تقویم انتشار</h2></div><div class="panel"><p>برای دیدن برنامه پخش سریال‌ها، به بخش «سریال‌ها» و قسمت «برنامه پخش روزانه» برو.</p><button class="smallbtn" onclick="showPage('series')">رفتن به تقویم پخش</button></div></div>
+<div class="section"><div class="secthead"><h2>⚙️ تنظیمات</h2></div><div class="panel"><div class="listrow"><span>حالت نمایش</span><span class="tag">تاریک</span></div><div class="listrow"><span>زبان برنامه</span><span class="tag">فارسی</span></div><div class="listrow"><span>حافظه موقت</span><button class="smallbtn" onclick="alert('اطلاعات نمایشی محلی پاک‌سازی شد.')">پاک‌سازی</button></div></div></div></section>
+</main>
+</div>
+<nav class="bottom"><div class="nav">
+<button class="active" data-page="home" onclick="showPage('home')"><span>⌂</span>خانه</button>
+<button data-page="movies" onclick="showPage('movies')"><span>⌕</span>جست‌وجو</button>
+<button data-page="series" onclick="showPage('series')"><span>▣</span>سریال‌ها</button>
+<button data-page="animation" onclick="showPage('animation')"><span>✦</span>انیمیشن</button>
+<button data-page="library" onclick="showPage('library')"><span>♡</span>کتابخانه</button>
+<button data-page="downloads" onclick="showPage('downloads')"><span>⇩</span>دانلودها</button>
+</div></nav>
+<div class="notice">مسلم اطلاعات آثار را از منابع بیرونی دریافت می‌کند. این برنامه خودش میزبان یا پخش‌کننده فیلم نیست؛ لینک‌ها فقط به صفحات اطلاعاتی یا وب‌سایت‌های رسمی منابع می‌روند. دسترسی به منابع ممکن است بسته به کشور و شبکه متفاوت باشد.</div>
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="modalbox"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
 <script>
-const items=[{id:1,title:'Big Buck Bunny',type:'انیمیشن',genre:'کمدی',year:2008,desc:'انیمیشن کوتاه و آزاد از پروژه‌های متن‌باز Blender. برای آشنایی با نمونه‌های دارای مجوز آزاد.',url:'https://peach.blender.org/'},{id:2,title:'Sintel',type:'فیلم',genre:'ماجراجویی',year:2010,desc:'فیلم کوتاه فانتزی و ماجراجویانه از بنیاد Blender؛ پروژه‌ای آزاد برای نمایش توانایی‌های تولید محتوای متن‌باز.',url:'https://durian.blender.org/'},{id:3,title:'Tears of Steel',type:'فیلم',genre:'علمی‌تخیلی',year:2012,desc:'فیلم کوتاه علمی‌تخیلی ساخته‌شده با ابزارهای آزاد Blender.',url:'https://mango.blender.org/'}];let filter='همه';let saved=JSON.parse(localStorage.getItem('moslem-list')||'[]');
-function render(){let q=document.getElementById('search').value.trim().toLowerCase(),g=document.getElementById('genre').value;let list=items.filter(x=>(filter==='همه'||filter==='تماشای من'&&saved.includes(x.id)||x.type===filter)&&(g==='همه'||x.genre===g)&&(x.title.toLowerCase().includes(q)||x.genre.includes(q)));document.getElementById('heading').textContent=filter==='تماشای من'?'فهرست تماشای من':'پیشنهادهای تماشا';document.getElementById('count').textContent=list.length+' اثر';document.getElementById('grid').innerHTML=list.length?list.map((x,i)=>`<article class="movie" onclick="openDetail(${x.id})"><div class="poster ${i%2?'alt':''}">${x.title}</div><div class="info"><b>${x.title}</b><span class="tag">${x.type} · ${x.year}</span></div></article>`).join(''):'<div class="empty">موردی پیدا نشد.</div>'}
-function openDetail(id){let x=items.find(a=>a.id===id);document.getElementById('detail').innerHTML=`<small class="tag">${x.type} · ${x.year} · ${x.genre}</small><h2>${x.title}</h2><p>${x.desc}</p><button class="primary" onclick="window.open('${x.url}','_blank')">رفتن به منبع رسمی</button> <button onclick="toggleSave(${x.id})">${saved.includes(x.id)?'حذف از فهرست من':'افزودن به فهرست من'}</button>`;document.getElementById('modal').style.display='flex'}function closeModal(){document.getElementById('modal').style.display='none'}function toggleSave(id){saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];localStorage.setItem('moslem-list',JSON.stringify(saved));closeModal();render()}
-document.getElementById('search').addEventListener('input',render);document.getElementById('genre').addEventListener('change',render);document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click',()=>{filter=b.dataset.filter;document.querySelectorAll('.navbtn').forEach(x=>x.classList.toggle('active',x===b));render()}));render();
-</script></body></html>
+let films=[]; // آثار واقعی پس از جست‌وجو از منابع آنلاین دریافت می‌شوند.
+let favorites=JSON.parse(localStorage.getItem("moslemFav")||"[]"),watched=JSON.parse(localStorage.getItem("moslemWatched")||"[]"),activeGenre="";
+function save(){localStorage.setItem("moslemFav",JSON.stringify(favorites));localStorage.setItem("moslemWatched",JSON.stringify(watched));}
+function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));if(id==="library")renderLibrary();if(id==="profile")updateCounts();window.scrollTo({top:0,behavior:"smooth"});}
+function card(f){return `<article class="movie"><div class="poster" style="--c1:${f.colors?.[0]||"#3a5367"};--c2:${f.colors?.[1]||"#101a2d"};${f.poster?`background-image:linear-gradient(0deg,#080b13dd,transparent 70%),url(${f.poster});background-size:cover;background-position:center`:""}"><span class="rating">${f.rating?"★ "+f.rating:"اطلاعات"}</span><button class="fav" onclick="toggleFav(${Number(f.id)})">${favorites.includes(Number(f.id))?"♥":"♡"}</button><div class="posterTitle">${escapeHtml(f.title)}</div></div><div class="movieInfo"><strong>${escapeHtml(f.title)}</strong><div class="meta">${f.year||"نامشخص"} · ${escapeHtml(f.genre||"ژانر نامشخص")} · ${escapeHtml(f.country||"بین‌المللی")}</div><div class="movieActions"><button class="smallbtn gold" onclick="details(${Number(f.id)})">جزئیات</button><button class="smallbtn" onclick="markWatched(${Number(f.id)})">${watched.includes(Number(f.id))?"تماشا شد ✓":"تماشا کردم"}</button></div></div></article>`}
+function renderMovies(){let q=(document.getElementById("q").value||"").trim().toLowerCase(),g=document.getElementById("genre").value,c=document.getElementById("country").value,y=document.getElementById("year").value,l=document.getElementById("lang").value,s=document.getElementById("sort").value;let arr=films.filter(f=>(!q||(f.title+" "+f.cast+" "+f.genre+" "+f.country).toLowerCase().includes(q))&&(!g||f.genre===g)&&(!c||f.country===c)&&(!y||String(f.year)===y)&&(!l||f.lang===l));arr.sort((a,b)=>s==="year"?b.year-a.year:s==="name"?a.title.localeCompare(b.title,"fa"):b.rating-a.rating);document.getElementById("movieGrid").innerHTML=arr.map(card).join("")||'<div class="empty">فیلمی با این مشخصات پیدا نشد.</div>';document.getElementById("resultCount").textContent=arr.length+" نتیجه";}
+function setGenre(g,el){activeGenre=g;document.querySelectorAll("#homeChips .chip").forEach(x=>x.classList.remove("active"));el.classList.add("active");document.getElementById("homeGrid").innerHTML=films.filter(f=>g==="همه"||f.genre===g).sort((a,b)=>b.rating-a.rating).map(card).join("")}
+function toggleFav(id){favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];save();renderAll()}
+function markWatched(id){if(!watched.includes(id))watched.push(id);save();renderAll()}
+function details(id){let f=films.find(x=>Number(x.id)===Number(id));if(!f)return;document.getElementById("modalContent").innerHTML=`<div class="eyebrow">جزئیات اثر · ${f.sourceName||"اطلاعات نمونه"}</div><h2>${f.title}</h2><p class="muted">${f.year||"سال نامشخص"} · ${f.genre||"ژانر نامشخص"} · ${f.country||"بین‌المللی"} · ${f.lang||"زبان ثبت‌نشده"}</p><h3>${f.rating?"★ "+f.rating+" از ۱۰":"امتیاز ثبت نشده"}</h3><p>${f.desc||"توضیحی برای این اثر ثبت نشده است."}</p><p class="muted">بازیگران / عوامل: ${f.cast||"در منبع فعلی موجود نیست"}</p>${f.tvmazeId?`<button class="smallbtn" onclick="fetchSeriesCast(${Number(f.tvmazeId)})">دریافت فهرست بازیگران</button>`:""}${f.sourceUrl?`<p><a href="${f.sourceUrl}" target="_blank" rel="noopener" style="color:#f0cf86">مشاهده صفحه اثر در منبع اطلاعاتی ↗</a></p>`:""}<div class="notice">این لینک صفحه اطلاعات اثر است، نه تضمین پخش یا دانلود رایگان. لینک تماشا فقط از سرویس‌های دارای مجوز نمایش داده می‌شود.</div><button class="btn" onclick="toggleFav(${Number(id)});closeModal()">افزودن / حذف از علاقه‌مندی‌ها</button>`;document.getElementById("modal").classList.add("show")}
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+function renderLibrary(){let fav=films.filter(f=>favorites.includes(f.id)),wat=films.filter(f=>watched.includes(f.id));document.getElementById("favList").innerHTML=fav.map(f=>`<div class="listrow"><span>${f.title}</span><button class="smallbtn" onclick="details(${f.id})">جزئیات</button></div>`).join("")||'<div class="empty">هنوز فیلمی اضافه نشده.</div>';document.getElementById("watchedList").innerHTML=wat.map(f=>`<div class="listrow"><span>${f.title}</span><span class="tag">تماشا شده</span></div>`).join("")||'<div class="empty">هنوز فیلمی ثبت نشده.</div>';document.getElementById("homeFav").textContent=fav.length?fav.map(f=>f.title).join("، "):"هنوز فیلمی ذخیره نکرده‌ای."}
+function updateCounts(){document.getElementById("favCount").textContent=favorites.length;document.getElementById("watchedCount").textContent=watched.length}
+function renderAll(){document.getElementById("homeGrid").innerHTML=films.slice().sort((a,b)=>(b.rating||0)-(a.rating||0)).map(card).join("");document.getElementById("homeEmpty").style.display=films.length?"none":"block";document.getElementById("animationGrid").innerHTML=films.filter(f=>f.genre==="انیمیشن").map(card).join("");renderMovies();renderLibrary();updateCounts()}
+renderAll();
+
+/* اتصال واقعی به Supabase — کلید Publishable عمومی است و کلید محرمانه سرور در مرورگر قرار نمی‌گیرد. */
+const MOSLEM_SUPABASE_URL = "https://zgqqbwwjcyndlfcccpih.supabase.co";
+const MOSLEM_SUPABASE_KEY = "sb_publishable_K3RzdaV_uKJGZDiYDXfAbg_9jzODuvl";
+const moslemDb = window.supabase.createClient(MOSLEM_SUPABASE_URL, MOSLEM_SUPABASE_KEY);
+let moslemUser = null;
+
+function accountMessage(message, isError=false){
+  const el=document.getElementById('accountMessage');
+  if(el){el.textContent=message;el.style.color=isError?'#ff9b9b':'#a8e6c4';}
+}
+function openAccount(){
+  const logged=!!moslemUser;
+  document.getElementById('modalContent').innerHTML = logged
+    ? `<div class="eyebrow">حساب کاربری مسلم</div><h2>سلام ${escapeHtml(moslemUser.email||'دوست من')}</h2><p class="muted">اطلاعات علاقه‌مندی‌ها و تماشا با حساب تو همگام می‌شود.</p><button class="btn secondary" onclick="signOutMoslem()">خروج از حساب</button><p id="accountMessage" class="muted"></p>`
+    : `<div class="eyebrow">حساب کاربری مسلم</div><h2>ورود یا ثبت‌نام</h2><p class="muted">برای ذخیره علاقه‌مندی‌ها و سابقه تماشا در دستگاه‌های دیگر، با ایمیل وارد شو.</p><input id="authEmail" type="email" placeholder="ایمیل" autocomplete="email" style="width:100%;padding:12px;margin:7px 0;background:#0d1421;color:white;border:1px solid var(--line);border-radius:10px"><input id="authPassword" type="password" placeholder="رمز عبور (حداقل ۶ نویسه)" autocomplete="current-password" style="width:100%;padding:12px;margin:7px 0;background:#0d1421;color:white;border:1px solid var(--line);border-radius:10px"><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn" onclick="signInMoslem()">ورود</button><button class="btn secondary" onclick="signUpMoslem()">ساخت حساب</button></div><p id="accountMessage" class="muted"></p>`;
+  document.getElementById('modal').classList.add('show');
+}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function signInMoslem(){
+  const email=document.getElementById('authEmail')?.value.trim();
+  const password=document.getElementById('authPassword')?.value||'';
+  if(!email||!password){accountMessage('ایمیل و رمز عبور را وارد کن.',true);return;}
+  accountMessage('در حال ورود…');
+  const {error}=await moslemDb.auth.signInWithPassword({email,password});
+  if(error){accountMessage('ورود انجام نشد: '+error.message,true);return;}
+  await loadMoslemAccount();openAccount();
+}
+async function signUpMoslem(){
+  const email=document.getElementById('authEmail')?.value.trim();
+  const password=document.getElementById('authPassword')?.value||'';
+  if(!email||password.length<6){accountMessage('ایمیل معتبر و رمز حداقل ۶ نویسه‌ای وارد کن.',true);return;}
+  accountMessage('در حال ساخت حساب…');
+  const {data,error}=await moslemDb.auth.signUp({email,password});
+  if(error){accountMessage('ثبت‌نام انجام نشد: '+error.message,true);return;}
+  if(data.session){await loadMoslemAccount();openAccount();}
+  else accountMessage('حساب ساخته شد. اگر تأیید ایمیل فعال باشد، ایمیلت را بررسی کن و سپس وارد شو.');
+}
+async function signOutMoslem(){
+  const {error}=await moslemDb.auth.signOut();
+  if(error){accountMessage('خروج انجام نشد: '+error.message,true);return;}
+  moslemUser=null;favorites=[];watched=[];save();renderAll();updateAccountUI();closeModal();
+}
+function updateAccountUI(){
+  const status=document.getElementById('accountStatus');
+  const button=document.getElementById('accountButton');
+  if(status)status.textContent=moslemUser?('متصل: '+moslemUser.email+' · همگام‌سازی روشن'):'برای همگام‌سازی اطلاعات، وارد حساب خودت شو.';
+  if(button)button.textContent=moslemUser?'مدیریت حساب / خروج':'ورود / ثبت‌نام';
+}
+async function syncLibraryItem(id,state,remove=false){
+  if(!moslemUser)return;
+  const f=films.find(x=>x.id===id);if(!f)return;
+  const key=String(f.id);
+  let query=moslemDb.from('user_library_items').delete().eq('user_id',moslemUser.id).eq('item_key',key).eq('state',state);
+  if(remove){const {error}=await query;if(error)console.error('Library delete:',error.message);return;}
+  const row={user_id:moslemUser.id,item_key:key,title:f.title,media_type:f.mediaType|| (f.genre==='انیمیشن'?'animation':'movie'),release_year:f.year,state,item_data:{genre:f.genre,country:f.country,language:f.lang,rating:f.rating,cast:f.cast,description:f.desc,colors:f.colors,poster:f.poster||'',sourceName:f.sourceName||'',sourceUrl:f.sourceUrl||'',mediaType:f.mediaType||'movie',tvmazeId:f.tvmazeId||null}};
+  const {error}=await moslemDb.from('user_library_items').upsert(row,{onConflict:'user_id,item_key,state'});
+  if(error)console.error('Library sync:',error.message);
+}
+const localToggleFav=toggleFav;
+toggleFav=function(id){const was=favorites.includes(id);localToggleFav(id);syncLibraryItem(id,'favorite',was);};
+const localMarkWatched=markWatched;
+markWatched=function(id){const was=watched.includes(id);localMarkWatched(id);if(!was)syncLibraryItem(id,'watched',false);};
+async function loadMoslemAccount(){
+  const {data:{user}}=await moslemDb.auth.getUser();
+  moslemUser=user||null;
+  if(moslemUser){
+    const {data,error}=await moslemDb.from('user_library_items').select('item_key,state,title,media_type,release_year,item_data').eq('user_id',moslemUser.id);
+    if(error){console.error('Library load:',error.message);}
+    else{
+      (data||[]).forEach(x=>{if(!films.some(f=>String(f.id)===String(x.item_key)) && x.item_data){const d=x.item_data;films.push({id:Number(x.item_key),title:x.title,year:x.release_year,genre:d.genre||'نامشخص',country:d.country||'بین‌المللی',lang:d.language||'ثبت‌نشده',rating:d.rating||0,cast:d.cast||'',colors:d.colors||['#3a5367','#101a2d'],desc:d.description||'',poster:d.poster||'',sourceName:d.sourceName||'کاتالوگ آنلاین',sourceUrl:d.sourceUrl||'',mediaType:d.mediaType||x.media_type||'movie',tvmazeId:d.tvmazeId||null});}});
+      favorites=(data||[]).filter(x=>x.state==='favorite').map(x=>Number(x.item_key)).filter(Number.isFinite);
+      watched=(data||[]).filter(x=>x.state==='watched').map(x=>Number(x.item_key)).filter(Number.isFinite);
+      save();
+    }
+  }
+  updateAccountUI();renderAll();
+}
+// کاتالوگ آنلاین بدون کلید اختصاصی: جست‌وجوی متادیتا در Apple iTunes Search API.
+// این منبع پوشش کامل سینما/سریال ندارد و لینک آن فقط صفحه اطلاعات اثر است.
+async function searchOnlineCatalog(){
+  const q=document.getElementById('q').value.trim();
+  const status=document.getElementById('onlineStatus');
+  if(!q){status.textContent='اول نام فیلم یا عنوان انگلیسی را در کادر جست‌وجو بنویس.';return;}
+  status.textContent='در حال دریافت اطلاعات از کاتالوگ آنلاین…';
+  try{
+    const url='https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&entity=movie&media=movie&limit=35&country=us';
+    const response=await fetch(url);
+    if(!response.ok)throw new Error('پاسخ منبع آنلاین دریافت نشد.');
+    const payload=await response.json();
+    const found=(payload.results||[]).filter(x=>x.trackId&&x.trackName).map(x=>({
+      id:Number(x.trackId),title:x.trackName,year:x.releaseDate?Number(x.releaseDate.slice(0,4)):null,
+      genre:x.primaryGenreName||'نامشخص',country:'بین‌المللی',lang:x.languageCodesISO2A?.[0]||'ثبت‌نشده',
+      rating:0,cast:x.artistName||'در منبع موجود نیست',colors:['#38566f','#121b2d'],
+      desc:x.longDescription||x.shortDescription||'توضیحات تکمیلی در صفحه منبع اثر موجود است.',
+      poster:(x.artworkUrl100||'').replace('100x100bb','600x900bb'),sourceName:'Apple iTunes Search',sourceUrl:x.trackViewUrl||'',mediaType:'movie'
+    }));
+    if(!found.length){status.textContent='نتیجه‌ای پیدا نشد. عنوان انگلیسی اثر را هم امتحان کن.';return;}
+    found.forEach(f=>{const i=films.findIndex(old=>Number(old.id)===f.id);if(i>=0)films[i]=f;else films.push(f);});
+    document.getElementById('genre').value='';document.getElementById('country').value='';document.getElementById('year').value='';document.getElementById('lang').value='';
+    renderMovies();
+    status.textContent=found.length+' نتیجه از Apple دریافت شد. این منبع رایگان و بدون API Key است؛ پوشش آن کامل نیست و لینک‌ها صفحه اطلاعات‌اند، نه لینک تماشای رایگان.';
+  }catch(e){status.textContent='جست‌وجوی آنلاین ناموفق بود. ممکن است دسترسی شبکه یا سرویس از منطقه فعلی محدود باشد. '+(e.message||'');}
+}
+
+async function fetchSeriesCast(showId){
+  const f=films.find(x=>Number(x.tvmazeId)===Number(showId));if(!f)return;
+  try{
+    const res=await fetch('https://api.tvmaze.com/shows/'+Number(showId)+'/cast');
+    if(!res.ok)throw new Error('فهرست بازیگران دریافت نشد.');
+    const data=await res.json();f.cast=data.slice(0,18).map(x=>x.person?.name).filter(Boolean).join('، ')||'در منبع ثبت نشده است.';
+    details(f.id);
+  }catch(e){const el=document.getElementById('modalContent');if(el)el.insertAdjacentHTML('beforeend','<p class="muted">دریافت بازیگران ناموفق بود؛ اتصال شبکه را بررسی کن.</p>');}
+}
+// جست‌وجوی سریال‌ها و تقویم پخش با API عمومی TVmaze؛ بدون کلید اختصاصی.
+async function searchSeriesOnline(){
+  const q=document.getElementById('seriesQuery').value.trim();
+  const status=document.getElementById('seriesStatus');
+  const grid=document.getElementById('seriesGrid');
+  if(!q){status.textContent='اول نام سریال را وارد کن.';return;}
+  status.textContent='در حال جست‌وجوی سریال‌ها…';grid.innerHTML='';
+  try{
+    const res=await fetch('https://api.tvmaze.com/search/shows?q='+encodeURIComponent(q));
+    if(!res.ok)throw new Error('پاسخ منبع سریال دریافت نشد.');
+    const data=await res.json();
+    const found=data.slice(0,25).map(x=>{const a=x.show||{};return {
+      id:1000000000+Number(a.id),tvmazeId:Number(a.id),title:a.name||'بدون نام',year:a.premiered?Number(a.premiered.slice(0,4)):null,
+      genre:(a.genres||[]).slice(0,2).join('، ')||'نامشخص',country:a.network?.country?.name||a.webChannel?.country?.name||'نامشخص',
+      lang:a.language||'نامشخص',rating:a.rating?.average||0,cast:'برای فهرست بازیگران صفحه TVmaze را ببین.',
+      colors:['#38566f','#121b2d'],desc:(a.summary||'خلاصه داستان در منبع ثبت نشده است.').replace(/<[^>]*>/g,' '),
+      poster:a.image?.original||a.image?.medium||'',sourceName:'TVmaze',sourceUrl:a.officialSite||a.url||'',mediaType:'series'
+    };});
+    if(!found.length){status.textContent='سریالی پیدا نشد؛ املای انگلیسی عنوان را امتحان کن.';return;}
+    found.forEach(f=>{const i=films.findIndex(z=>Number(z.id)===f.id);if(i<0)films.push(f);else films[i]=f;});
+    grid.innerHTML=found.map(card).join('');
+    status.textContent=found.length+' سریال پیدا شد. اطلاعات از TVmaze است؛ لینک رسمی فقط در صورت ثبت‌شدن توسط منبع نمایش داده می‌شود.';
+  }catch(e){status.textContent='اتصال به منبع سریال ناموفق بود؛ ممکن است دسترسی شبکه محدود باشد. '+(e.message||'');}
+}
+async function loadTVSchedule(){
+  const date=document.getElementById('scheduleDate').value||new Date().toISOString().slice(0,10);
+  const status=document.getElementById('scheduleStatus'),list=document.getElementById('scheduleList');
+  status.textContent='در حال دریافت برنامه پخش…';list.innerHTML='';
+  try{
+    const res=await fetch('https://api.tvmaze.com/schedule?country=US&date='+encodeURIComponent(date));
+    if(!res.ok)throw new Error('برنامه پخش دریافت نشد.');
+    const data=await res.json();
+    const rows=data.filter(x=>x.show&&x.name).slice(0,80);
+    list.innerHTML=rows.map(x=>`<div class="listrow"><div><b>${escapeHtml(x.show.name)}</b><div class="muted">${escapeHtml(x.name)} · فصل ${x.season||'-'}، قسمت ${x.number||'-'}</div></div><span class="tag">${escapeHtml(x.airtime||'زمان نامشخص')}</span></div>`).join('')||'<div class="empty">برای این تاریخ برنامه‌ای در منبع ثبت نشده است.</div>';
+    status.textContent=rows.length+' قسمت در برنامه پخش آمریکا برای '+date+' پیدا شد. این تقویم جهانی و مخصوص همه کشورها نیست.';
+  }catch(e){status.textContent='دریافت تقویم ناموفق بود؛ ممکن است دسترسی شبکه محدود باشد. '+(e.message||'');}
+}
+const scheduleInput=document.getElementById('scheduleDate');if(scheduleInput)scheduleInput.value=new Date().toISOString().slice(0,10);
+
+moslemDb.auth.onAuthStateChange((_event,_session)=>{
+  setTimeout(()=>loadMoslemAccount(),0);
+});
+loadMoslemAccount();
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+
+</script>
+</body>
+</html>
