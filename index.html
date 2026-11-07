@@ -87,7 +87,7 @@ function safeHttpUrl(value){try{const u=new URL(value);return u.protocol==="http
 let aparatLinks=(()=>{try{return JSON.parse(localStorage.getItem("moslemAparatLinks")||"{}")}catch(_){return {}}})();
 function extractAparatHash(value){
  const s=String(value||"").trim();
- const m=s.match(/(?:aparat\\.com\\/(?:v|video\\/video\\/embed\\/videohash)\\/)([A-Za-z0-9_-]+)/i);
+ const m=s.match(/(?:aparat\.com\/(?:v|video\/video\/embed\/videohash)\/)([A-Za-z0-9_-]+)/i);
  return m?m[1]:"";
 }
 function playAparatForMovie(id){
