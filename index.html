@@ -155,29 +155,47 @@ async function loadMoslemAccount(){
 }
 // کاتالوگ آنلاین بدون کلید اختصاصی: جست‌وجوی متادیتا در Apple iTunes Search API.
 // این منبع پوشش کامل سینما/سریال ندارد و لینک آن فقط صفحه اطلاعات اثر است.
+// دریافت از Apple با روش JSONP به‌عنوان مسیر جایگزین؛ برای مرورگرهایی که fetch/CORS را مسدود می‌کنند.
+function itunesJsonp(term){
+  return new Promise((resolve,reject)=>{
+    const cb='moslemItunes_'+Date.now()+'_'+Math.floor(Math.random()*100000);
+    const script=document.createElement('script');
+    const timer=setTimeout(()=>{cleanup();reject(new Error('زمان پاسخ منبع تمام شد.'));},12000);
+    function cleanup(){clearTimeout(timer);delete window[cb];script.remove();}
+    window[cb]=(data)=>{cleanup();resolve(data||{});};
+    script.onerror=()=>{cleanup();reject(new Error('اتصال به کاتالوگ اپل برقرار نشد.'));};
+    script.src='https://itunes.apple.com/search?term='+encodeURIComponent(term)+'&entity=movie&limit=35&country=us&callback='+cb;
+    document.head.appendChild(script);
+  });
+}
+function mapItunesMovie(x){
+  return {id:Number(x.trackId),title:x.trackName,year:x.releaseDate?Number(x.releaseDate.slice(0,4)):null,
+    genre:x.primaryGenreName||'نامشخص',country:'بین‌المللی',lang:x.languageCodesISO2A?.[0]||'ثبت‌نشده',
+    rating:0,cast:x.artistName||'در منبع موجود نیست',colors:['#38566f','#121b2d'],
+    desc:x.longDescription||x.shortDescription||'توضیحات تکمیلی در صفحه منبع اثر موجود است.',
+    poster:(x.artworkUrl100||'').replace('100x100bb','600x900bb'),sourceName:'Apple iTunes Search',sourceUrl:x.trackViewUrl||'',mediaType:'movie'};
+}
 async function searchOnlineCatalog(){
   const q=document.getElementById('q').value.trim();
   const status=document.getElementById('onlineStatus');
   if(!q){status.textContent='اول نام فیلم یا عنوان انگلیسی را در کادر جست‌وجو بنویس.';return;}
-  status.textContent='در حال دریافت اطلاعات از کاتالوگ آنلاین…';
+  status.textContent='در حال جست‌وجو… اگر اتصال مستقیم محدود باشد، مسیر جایگزین فعال می‌شود.';
   try{
-    const url='https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&entity=movie&media=movie&limit=35&country=us';
-    const response=await fetch(url);
-    if(!response.ok)throw new Error('پاسخ منبع آنلاین دریافت نشد.');
-    const payload=await response.json();
-    const found=(payload.results||[]).filter(x=>x.trackId&&x.trackName).map(x=>({
-      id:Number(x.trackId),title:x.trackName,year:x.releaseDate?Number(x.releaseDate.slice(0,4)):null,
-      genre:x.primaryGenreName||'نامشخص',country:'بین‌المللی',lang:x.languageCodesISO2A?.[0]||'ثبت‌نشده',
-      rating:0,cast:x.artistName||'در منبع موجود نیست',colors:['#38566f','#121b2d'],
-      desc:x.longDescription||x.shortDescription||'توضیحات تکمیلی در صفحه منبع اثر موجود است.',
-      poster:(x.artworkUrl100||'').replace('100x100bb','600x900bb'),sourceName:'Apple iTunes Search',sourceUrl:x.trackViewUrl||'',mediaType:'movie'
-    }));
-    if(!found.length){status.textContent='نتیجه‌ای پیدا نشد. عنوان انگلیسی اثر را هم امتحان کن.';return;}
+    let payload=null;
+    try{
+      const response=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&entity=movie&limit=35&country=us');
+      if(response.ok)payload=await response.json();
+    }catch(_e){}
+    if(!payload || !Array.isArray(payload.results)) payload=await itunesJsonp(q);
+    const found=(payload.results||[]).filter(x=>x.trackId&&x.trackName).map(mapItunesMovie);
+    if(!found.length){status.textContent='منبع اپل برای این عبارت نتیجه‌ای نداد. نام انگلیسی کوتاه‌تر را امتحان کن.';return;}
     found.forEach(f=>{const i=films.findIndex(old=>Number(old.id)===f.id);if(i>=0)films[i]=f;else films.push(f);});
-    document.getElementById('genre').value='';document.getElementById('country').value='';document.getElementById('year').value='';document.getElementById('lang').value='';
+    ['genre','country','year','lang'].forEach(id=>document.getElementById(id).value='');
     renderMovies();
-    status.textContent=found.length+' نتیجه از Apple دریافت شد. این منبع رایگان و بدون API Key است؛ پوشش آن کامل نیست و لینک‌ها صفحه اطلاعات‌اند، نه لینک تماشای رایگان.';
-  }catch(e){status.textContent='جست‌وجوی آنلاین ناموفق بود. ممکن است دسترسی شبکه یا سرویس از منطقه فعلی محدود باشد. '+(e.message||'');}
+    status.textContent=found.length+' نتیجه دریافت شد. توجه: این کاتالوگ کامل نیست و لینک‌ها صفحه اطلاعات/فروشگاه‌اند، نه لینک تماشای رایگان.';
+  }catch(e){
+    status.textContent='اتصال به منبع فیلم برقرار نشد. ممکن است اینترنت یا دسترسی منطقه‌ای سرویس محدود باشد. '+(e.message||'');
+  }
 }
 
 async function fetchSeriesCast(showId){
