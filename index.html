@@ -66,7 +66,8 @@ try{
  const cachedCatalog=JSON.parse(localStorage.getItem("moslemCatalog")||"[]");
  films=Array.isArray(cachedCatalog)?cachedCatalog.filter(f=>f&&f.archiveIdentifier&&/^https:\/\//i.test(f.archiveStream||"")&&/^https:\/\//i.test(f.archiveDownload||"")&&/^https:\/\//i.test(f.poster||"")):[];
 }catch(_){films=[];}
-let favorites=JSON.parse(localStorage.getItem("moslemFav")||"[]"),watched=JSON.parse(localStorage.getItem("moslemWatched")||"[]"),activeGenre="";
+function readLocalArray(key){try{const value=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(value)?value:[]}catch(_){return []}}
+let favorites=readLocalArray("moslemFav"),watched=readLocalArray("moslemWatched"),activeGenre="";
 function save(){localStorage.setItem("moslemFav",JSON.stringify(favorites));localStorage.setItem("moslemWatched",JSON.stringify(watched));}
 function saveCatalog(){try{localStorage.setItem("moslemCatalog",JSON.stringify(films.slice(0,180)))}catch(_){}}
 function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));if(id==="library")renderLibrary();if(id==="profile")updateCounts();window.scrollTo({top:0,behavior:"smooth"});}
@@ -168,7 +169,7 @@ async function loadFreeArchiveFilms(){
 }
 function hashText(s){let h=0;for(let i=0;i<s.length;i++)h=((h<<5)-h+s.charCodeAt(i))|0;return h}
 function closeModal(){document.getElementById("modal").classList.remove("show")}
-function renderLibrary(){let available=films.filter(isFreeVerified),fav=available.filter(f=>favorites.includes(f.id)),wat=available.filter(f=>watched.includes(f.id));document.getElementById("favList").innerHTML=fav.map(f=>`<div class="listrow"><span>${f.title}</span><button class="smallbtn" onclick="details(${f.id})">جزئیات</button></div>`).join("")||'<div class="empty">هنوز فیلمی اضافه نشده.</div>';document.getElementById("watchedList").innerHTML=wat.map(f=>`<div class="listrow"><span>${f.title}</span><span class="tag">تماشا شده</span></div>`).join("")||'<div class="empty">هنوز فیلمی ثبت نشده.</div>';document.getElementById("homeFav").textContent=fav.length?fav.map(f=>f.title).join("، "):"هنوز فیلمی ذخیره نکرده‌ای."}
+function renderLibrary(){const fav=films.filter(f=>favorites.includes(Number(f.id))),wat=films.filter(f=>watched.includes(Number(f.id)));document.getElementById("favList").innerHTML=fav.map(f=>`<div class="listrow"><span>${escapeHtml(f.title)}</span>${isFreeVerified(f)?`<button class="smallbtn" onclick="details(${Number(f.id)})">جزئیات</button>`:'<span class="tag">فقط اطلاعات ذخیره‌شده</span>'}</div>`).join("")||'<div class="empty">هنوز فیلمی اضافه نشده.</div>';document.getElementById("watchedList").innerHTML=wat.map(f=>`<div class="listrow"><span>${escapeHtml(f.title)}</span><span class="tag">تماشا شده</span></div>`).join("")||'<div class="empty">هنوز فیلمی ثبت نشده.</div>';document.getElementById("homeFav").textContent=fav.length?fav.map(f=>f.title).join("، "):"هنوز فیلمی ذخیره نکرده‌ای."}
 function updateCounts(){document.getElementById("favCount").textContent=favorites.length;document.getElementById("watchedCount").textContent=watched.length}
 function renderAll(){const available=films.filter(isFreeVerified);document.getElementById("homeGrid").innerHTML=available.slice().sort((a,b)=>(b.rating||0)-(a.rating||0)).map(card).join("");document.getElementById("homeEmpty").style.display=available.length?"none":"block";document.getElementById("animationGrid").innerHTML=available.filter(f=>genreMatches(f,"انیمیشن")).map(card).join("");updateYearOptions();renderMovies();renderLibrary();updateCounts()}
 renderAll();
@@ -240,7 +241,10 @@ const localMarkWatched=markWatched;
 markWatched=function(id){const was=watched.includes(id);localMarkWatched(id);if(!was)syncLibraryItem(id,'watched',false);};
 async function loadMoslemAccount(){
   if(!moslemDb){updateAccountUI();return;}
-  const {data:{user}}=await moslemDb.auth.getUser();
+  let authData;
+  try{authData=await moslemDb.auth.getUser();}
+  catch(e){console.warn('Auth session check:',e);updateAccountUI();return;}
+  const user=authData?.data?.user||null;
   moslemUser=user||null;
   if(moslemUser){
     const {data,error}=await moslemDb.from('user_library_items').select('item_key,state,title,media_type,release_year,item_data').eq('user_id',moslemUser.id);
