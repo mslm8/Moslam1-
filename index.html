@@ -61,7 +61,7 @@ button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1100px;mar
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="modalbox"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
 <script>
 const STARTER_FILMS=[];
-let films=(()=>{try{const saved=JSON.parse(localStorage.getItem("moslemCatalog")||"[]");return [...STARTER_FILMS,...(Array.isArray(saved)?saved.filter(x=>Number(x.id)!==990001):[])]}catch(_){return STARTER_FILMS.slice()}})(); // نمایش یک فیلم آرشیوی معتبر حتی در صورت قطع API
+let films=[]; try{localStorage.removeItem("moslemCatalog")}catch(_){/* ignore */}
 let favorites=JSON.parse(localStorage.getItem("moslemFav")||"[]"),watched=JSON.parse(localStorage.getItem("moslemWatched")||"[]"),activeGenre="";
 function save(){localStorage.setItem("moslemFav",JSON.stringify(favorites));localStorage.setItem("moslemWatched",JSON.stringify(watched));}
 function saveCatalog(){try{localStorage.setItem("moslemCatalog",JSON.stringify(films.slice(0,180)))}catch(_){}}
@@ -80,7 +80,7 @@ function genreMatches(f,g){if(!g)return true;return String(f.genre||"").split(/[
 function genreDisplay(value){const parts=String(value||"ژانر نامشخص").split(/[،,]/).map(x=>normalizeGenre(x.trim())||x.trim()).filter(Boolean);return [...new Set(parts)].join("، ");}
 function updateYearOptions(){const el=document.getElementById("year");if(!el)return;const selected=el.value,years=[...new Set(films.map(f=>Number(f.year)).filter(y=>Number.isInteger(y)&&y>1800&&y<2200))].sort((a,b)=>b-a);el.innerHTML="<option value=\"\">همه سال‌ها</option>"+years.map(y=>"<option value=\""+y+"\">"+y+"</option>").join("");if(years.includes(Number(selected)))el.value=selected;}
 function isFreeVerified(f){return !!(f&&f.archiveIdentifier&&f.archiveStream&&f.archiveDownload&&f.poster&&safeHttpUrl(f.poster));}\nfunction renderMovies(){let q=(document.getElementById("q").value||"").trim().toLowerCase(),g=document.getElementById("genre").value,c=document.getElementById("country").value,y=document.getElementById("year").value,l=document.getElementById("lang").value,s=document.getElementById("sort").value;let arr=films.filter(isFreeVerified).filter(f=>(!q||(f.title+" "+f.cast+" "+f.genre+" "+f.country).toLowerCase().includes(q))&&genreMatches(f,g)&&(!c||f.country===c||f.country==="بین‌المللی"||f.country==="نامشخص")&&(!y||String(f.year)===y)&&(!l||f.lang===l||f.lang==="ثبت‌نشده"||f.lang==="نامشخص"));arr.sort((a,b)=>s==="year"?(Number(b.year)||0)-(Number(a.year)||0):s==="name"?a.title.localeCompare(b.title,"fa"):(Number(b.rating)||0)-(Number(a.rating)||0));document.getElementById("movieGrid").innerHTML=arr.map(card).join("")||"<div class=\"empty\">فیلمی با این مشخصات پیدا نشد.</div>";document.getElementById("resultCount").textContent=arr.length+" نتیجه";}
-function setGenre(g,el){activeGenre=g;document.querySelectorAll("#homeChips .chip").forEach(x=>x.classList.remove("active"));el.classList.add("active");document.getElementById("homeGrid").innerHTML=films.filter(f=>g==="همه"||genreMatches(f,g)).sort((a,b)=>(Number(b.rating)||0)-(Number(a.rating)||0)).map(card).join("")||"<div class=\"empty\">برای این ژانر هنوز اثری پیدا نشده است.</div>"}
+function setGenre(g,el){activeGenre=g;document.querySelectorAll("#homeChips .chip").forEach(x=>x.classList.remove("active"));el.classList.add("active");document.getElementById("homeGrid").innerHTML=films.filter(isFreeVerified).filter(f=>g==="همه"||genreMatches(f,g)).sort((a,b)=>(Number(b.rating)||0)-(Number(a.rating)||0)).map(card).join("")||"<div class=\"empty\">برای این ژانر هنوز اثری پیدا نشده است.</div>"}
 function toggleFav(id){favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];save();renderAll()}
 function markWatched(id){if(!watched.includes(id))watched.push(id);save();renderAll()}
 function safeHttpUrl(value){try{const u=new URL(value);return u.protocol==="https:"?u.href:""}catch(_){return""}}
@@ -286,14 +286,15 @@ async function searchSeriesOnline(){
     const res=await fetch('https://api.tvmaze.com/search/shows?q='+encodeURIComponent(q));
     if(!res.ok)throw new Error('پاسخ منبع سریال دریافت نشد.');
     const data=await res.json();
-    const found=data.slice(0,25).map(x=>{const a=x.show||{};return {
+    const found=[]; /* TVmaze فقط اطلاعات سریال می‌دهد و مجوز تماشای رایگان را تأیید نمی‌کند؛ بنابراین پوستر/کارت نمایش داده نمی‌شود. */
+    /* const found=data.slice(0,25).map(x=>{const a=x.show||{};return {
       id:1000000000+Number(a.id),tvmazeId:Number(a.id),title:a.name||'بدون نام',year:a.premiered?Number(a.premiered.slice(0,4)):null,
       genre:(a.genres||[]).slice(0,2).join('، ')||'نامشخص',country:a.network?.country?.name||a.webChannel?.country?.name||'نامشخص',
       lang:a.language||'نامشخص',rating:a.rating?.average||0,cast:'برای فهرست بازیگران صفحه TVmaze را ببین.',
       colors:['#38566f','#121b2d'],desc:(a.summary||'خلاصه داستان در منبع ثبت نشده است.').replace(/<[^>]*>/g,' '),
       poster:a.image?.original||a.image?.medium||'',sourceName:'TVmaze',sourceUrl:a.officialSite||a.url||'',mediaType:'series'
-    };});
-    if(!found.length){status.textContent='سریالی پیدا نشد؛ املای انگلیسی عنوان را امتحان کن.';return;}
+    };}); */
+    if(!found.length){status.textContent='برای این سریال منبع رایگانِ مجاز و قابل‌تماشا تأیید نشده؛ برای همین هیچ پوستر یا کارت نمایشی اضافه نکردم.';return;}
     found.forEach(f=>{const i=films.findIndex(z=>Number(z.id)===f.id);if(i<0)films.push(f);else films[i]=f;});saveCatalog();
     grid.innerHTML=found.map(card).join('');
     status.textContent=found.length+' سریال پیدا شد. اطلاعات از TVmaze است؛ لینک رسمی فقط در صورت ثبت‌شدن توسط منبع نمایش داده می‌شود.';
