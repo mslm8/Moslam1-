@@ -1,0 +1,13 @@
+{
+  "name": "مسلم | سینما در جیب تو",
+  "short_name": "مسلم",
+  "description": "جست‌وجو و مدیریت فیلم‌ها و سریال‌ها",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#080b13",
+  "theme_color": "#080b13",
+  "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
