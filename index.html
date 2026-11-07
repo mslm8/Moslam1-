@@ -22,12 +22,12 @@ button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1100px;mar
 </head>
 <body>
 <div class="app">
-<header class="top"><div class="toprow"><div class="brand"><div class="logo">م</div>مسلم</div><div class="search"><input id="q" placeholder="جست‌وجوی فیلم، بازیگر..." oninput="renderMovies()"></div><button class="iconbtn" onclick="showPage('profile')" aria-label="پروفایل">☻</button></div></header>
+<header class="top"><div class="toprow"><div class="brand"><div class="logo">م</div>مسلم</div><div class="search"><input id="q" placeholder="نام فیلم را بنویس؛ برای جست‌وجوی آنلاین Enter بزن..." onfocus="if(!document.getElementById('movies').classList.contains('active'))showPage('movies')" oninput="renderMovies()" onkeydown="if(event.key==='Enter'){showPage('movies');searchOnlineCatalog()}"></div><button class="iconbtn" onclick="showPage('profile')" aria-label="پروفایل">☻</button></div></header>
 <main>
 <section id="home" class="page active">
 <div class="hero"><div class="heroContent"><div class="eyebrow">تجربه سینمایی مسلم</div><h1>دنیای فیلم‌ها، یک‌جا</h1><p>فیلم‌ها و سریال‌های محبوبت را پیدا کن، ذخیره کن و درباره‌شان نظر بده.</p><button class="btn" onclick="showPage('movies')">کشف فیلم‌ها　←</button></div></div>
 <div class="chips" id="homeChips"><button class="chip active" onclick="setGenre('همه',this)">همه</button><button class="chip" onclick="setGenre('اکشن',this)">اکشن</button><button class="chip" onclick="setGenre('درام',this)">درام</button><button class="chip" onclick="setGenre('معمایی',this)">معمایی</button><button class="chip" onclick="setGenre('علمی‌تخیلی',this)">علمی‌تخیلی</button><button class="chip" onclick="setGenre('انیمیشن',this)">انیمیشن</button></div>
-<div class="section"><div class="secthead"><h2>⭐ برترین فیلم‌ها</h2><span class="muted">آثار دریافت‌شده از منابع آنلاین</span></div><div class="grid" id="homeGrid"></div><div id="homeEmpty" class="empty">برای دیدن فیلم‌های واقعی، از بخش جست‌وجو نام فیلم را وارد کن.</div></div>
+<div class="section"><div class="secthead"><h2>⭐ برترین فیلم‌ها</h2><span class="muted">آثار دریافت‌شده از منابع آنلاین</span></div><div class="grid" id="homeGrid"></div><div id="homeEmpty" class="empty">هنوز فیلمی بارگذاری نشده است.<br><button class="btn" style="margin-top:12px" onclick="showPage('movies');document.getElementById('q').focus()">جست‌وجوی آنلاین فیلم‌ها</button></div></div>
 <div class="section"><div class="secthead"><h2>❤️ علاقه‌مندی‌های تو</h2><button class="smallbtn" onclick="showPage('library')">مشاهده همه</button></div><div id="homeFav" class="panel muted">هنوز فیلمی ذخیره نکرده‌ای.</div></div>
 </section>
 <section id="movies" class="page">
