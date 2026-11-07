@@ -27,7 +27,7 @@ button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1100px;mar
 <section id="home" class="page active">
 <div class="hero"><div class="heroContent"><div class="eyebrow">تجربه سینمایی مسلم</div><h1>دنیای فیلم‌ها، یک‌جا</h1><p>فیلم‌ها و سریال‌های محبوبت را پیدا کن، ذخیره کن و درباره‌شان نظر بده.</p><button class="btn" onclick="showPage('movies')">کشف فیلم‌ها　←</button></div></div>
 <div class="chips" id="homeChips"><button class="chip active" onclick="setGenre('همه',this)">همه</button><button class="chip" onclick="setGenre('اکشن',this)">اکشن</button><button class="chip" onclick="setGenre('درام',this)">درام</button><button class="chip" onclick="setGenre('معمایی',this)">معمایی</button><button class="chip" onclick="setGenre('علمی‌تخیلی',this)">علمی‌تخیلی</button><button class="chip" onclick="setGenre('انیمیشن',this)">انیمیشن</button></div>
-<div class="section"><div class="secthead"><h2>⭐ برترین فیلم‌ها</h2><span class="muted">آثار دریافت‌شده از منابع آنلاین</span></div><div class="grid" id="homeGrid"></div><div id="homeEmpty" class="empty">هنوز فیلمی بارگذاری نشده است.<br><button class="btn" style="margin-top:12px" onclick="showPage('movies');document.getElementById('q').focus()">جست‌وجوی آنلاین فیلم‌ها</button></div></div>
+<div class="section"><div class="secthead"><h2>⭐ برترین فیلم‌ها</h2><span class="muted">آثار دریافت‌شده از منابع آنلاین</span></div><div class="grid" id="homeGrid"></div><div id="homeEmpty" class="empty">هنوز فیلمی بارگذاری نشده است.<br><button class="btn" style="margin-top:12px" onclick="showPage('movies');document.getElementById('qMovies').focus()">جست‌وجوی آنلاین فیلم‌ها</button></div></div>
 <div class="section"><div class="secthead"><h2>❤️ علاقه‌مندی‌های تو</h2><button class="smallbtn" onclick="showPage('library')">مشاهده همه</button></div><div id="homeFav" class="panel muted">هنوز فیلمی ذخیره نکرده‌ای.</div></div>
 </section>
 <section id="movies" class="page">
@@ -176,11 +176,11 @@ renderAll();
 /* اتصال واقعی به Supabase — کلید Publishable عمومی است و کلید محرمانه سرور در مرورگر قرار نمی‌گیرد. */
 const MOSLEM_SUPABASE_URL = "https://zgqqbwwjcyndlfcccpih.supabase.co";
 const MOSLEM_SUPABASE_KEY = "sb_publishable_K3RzdaV_uKJGZDiYDXfAbg_9jzODuvl";
-const moslemDb = window.supabase.createClient(MOSLEM_SUPABASE_URL, MOSLEM_SUPABASE_KEY);
+const moslemDb = window.supabase?.createClient ? window.supabase.createClient(MOSLEM_SUPABASE_URL, MOSLEM_SUPABASE_KEY) : null;
 let moslemUser = null;
 
 function accountMessage(message, isError=false){
-  const el=document.getElementById('accountMessage');
+  const el=document.querySelector('#modal.show #modalContent #accountMessage')||document.querySelector('#profile #accountMessage');
   if(el){el.textContent=message;el.style.color=isError?'#ff9b9b':'#a8e6c4';}
 }
 function openAccount(){
@@ -192,6 +192,7 @@ function openAccount(){
 }
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 async function signInMoslem(){
+  if(!moslemDb){accountMessage('سرویس ورود بارگذاری نشد؛ اتصال اینترنت را بررسی کن.',true);return;}
   const email=document.getElementById('authEmail')?.value.trim();
   const password=document.getElementById('authPassword')?.value||'';
   if(!email||!password){accountMessage('ایمیل و رمز عبور را وارد کن.',true);return;}
@@ -201,6 +202,7 @@ async function signInMoslem(){
   await loadMoslemAccount();openAccount();
 }
 async function signUpMoslem(){
+  if(!moslemDb){accountMessage('سرویس ثبت‌نام بارگذاری نشد؛ اتصال اینترنت را بررسی کن.',true);return;}
   const email=document.getElementById('authEmail')?.value.trim();
   const password=document.getElementById('authPassword')?.value||'';
   if(!email||password.length<6){accountMessage('ایمیل معتبر و رمز حداقل ۶ نویسه‌ای وارد کن.',true);return;}
@@ -211,9 +213,10 @@ async function signUpMoslem(){
   else accountMessage('حساب ساخته شد. اگر تأیید ایمیل فعال باشد، ایمیلت را بررسی کن و سپس وارد شو.');
 }
 async function signOutMoslem(){
+  if(!moslemDb){accountMessage('سرویس حساب کاربری در دسترس نیست.',true);return;}
   const {error}=await moslemDb.auth.signOut();
   if(error){accountMessage('خروج انجام نشد: '+error.message,true);return;}
-  moslemUser=null;favorites=[];watched=[];save();renderAll();updateAccountUI();closeModal();
+  moslemUser=null;updateAccountUI();closeModal();
 }
 function updateAccountUI(){
   const status=document.getElementById('accountStatus');
@@ -222,7 +225,7 @@ function updateAccountUI(){
   if(button)button.textContent=moslemUser?'مدیریت حساب / خروج':'ورود / ثبت‌نام';
 }
 async function syncLibraryItem(id,state,remove=false){
-  if(!moslemUser)return;
+  if(!moslemDb||!moslemUser)return;
   const f=films.find(x=>x.id===id);if(!f)return;
   const key=String(f.id);
   let query=moslemDb.from('user_library_items').delete().eq('user_id',moslemUser.id).eq('item_key',key).eq('state',state);
@@ -236,6 +239,7 @@ toggleFav=function(id){const was=favorites.includes(id);localToggleFav(id);syncL
 const localMarkWatched=markWatched;
 markWatched=function(id){const was=watched.includes(id);localMarkWatched(id);if(!was)syncLibraryItem(id,'watched',false);};
 async function loadMoslemAccount(){
+  if(!moslemDb){updateAccountUI();return;}
   const {data:{user}}=await moslemDb.auth.getUser();
   moslemUser=user||null;
   if(moslemUser){
@@ -369,10 +373,12 @@ async function loadHomeCatalog(){
 loadFreeArchiveFilms();
 const scheduleInput=document.getElementById('scheduleDate');if(scheduleInput)scheduleInput.value=new Date().toISOString().slice(0,10);
 
-moslemDb.auth.onAuthStateChange((_event,_session)=>{
-  setTimeout(()=>loadMoslemAccount(),0);
-});
-loadMoslemAccount();
+if(moslemDb){
+  moslemDb.auth.onAuthStateChange((_event,_session)=>{
+    setTimeout(()=>loadMoslemAccount(),0);
+  });
+  loadMoslemAccount();
+}else{updateAccountUI();}
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
 // فهرست تجاری/اطلاعاتی اپل بارگذاری نمی‌شود؛ فقط آرشیو رایگانِ دارای مجوز و فایل واقعی نمایش داده می‌شود.
 
