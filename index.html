@@ -61,7 +61,11 @@ button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1100px;mar
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="modalbox"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
 <script>
 const STARTER_FILMS=[];
-let films=[]; try{localStorage.removeItem("moslemCatalog")}catch(_){/* ignore */}
+let films=[];
+try{
+ const cachedCatalog=JSON.parse(localStorage.getItem("moslemCatalog")||"[]");
+ films=Array.isArray(cachedCatalog)?cachedCatalog.filter(f=>f&&f.archiveIdentifier&&/^https:\/\//i.test(f.archiveStream||"")&&/^https:\/\//i.test(f.archiveDownload||"")&&/^https:\/\//i.test(f.poster||"")):[];
+}catch(_){films=[];}
 let favorites=JSON.parse(localStorage.getItem("moslemFav")||"[]"),watched=JSON.parse(localStorage.getItem("moslemWatched")||"[]"),activeGenre="";
 function save(){localStorage.setItem("moslemFav",JSON.stringify(favorites));localStorage.setItem("moslemWatched",JSON.stringify(watched));}
 function saveCatalog(){try{localStorage.setItem("moslemCatalog",JSON.stringify(films.slice(0,180)))}catch(_){}}
